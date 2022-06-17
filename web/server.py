@@ -9,11 +9,6 @@ import pymysql
 from flask import Flask, render_template
 import time
 
-config = configparser.RawConfigParser()
-path = '/'.join(__file__.split('/')[:-2])
-config.read(f'{path}/config.ini')
-print(f'{path}/config.ini')
-print(config['mysql'])
 app = Flask(__name__, template_folder='./')
 
 
@@ -25,11 +20,11 @@ def hello_world():
 @app.route('/list')
 def show_list():
     mysql_conn = pymysql.Connect(
-        host=config.get('mysql_info', 'host'),
-        port=int(config.get('mysql_info', 'port')),
-        user=config.get('mysql_info', 'user'),
-        passwd=config.get('mysql_info', 'passwd'),
-        db=config.get('mysql_info', 'db')
+        host='localhost',
+        port=3306,
+        user='root',
+        passwd='root',
+        db='demo'
     )
     mysql_cursor = mysql_conn.cursor()
     sql = "select * from lottery order by open_time asc;"
