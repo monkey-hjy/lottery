@@ -3,12 +3,14 @@
 # Date : 2022/6/17 17:00
 # Name : server.py
 import configparser
+import os
 
 import pymysql
 from flask import Flask, render_template
 import time
 
 config = configparser.RawConfigParser()
+print(os.getcwd())
 config.read('../config.ini')
 app = Flask(__name__, template_folder='./')
 
