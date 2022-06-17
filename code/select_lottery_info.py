@@ -27,6 +27,7 @@ sql = "select * from lottery where win_uid is null;"
 mysql_cursor.execute(sql)
 data = mysql_cursor.fetchall()
 for info in data:
+    print(info)
     if int(info[3]) <= int(time.time()):
         url = f'https://api.vc.bilibili.com/lottery_svr/v1/lottery_svr/lottery_notice?dynamic_id={info[1]}'
         win_uid = list()
