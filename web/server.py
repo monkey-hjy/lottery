@@ -9,7 +9,7 @@ from flask import Flask, render_template
 import time
 
 config = configparser.RawConfigParser()
-config.read('../code/config.ini')
+config.read('../config.ini')
 app = Flask(__name__, template_folder='./')
 
 

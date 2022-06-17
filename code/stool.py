@@ -16,7 +16,7 @@ import configparser
 
 logger.add('lottery.log', mode='a')
 config = configparser.RawConfigParser()
-config.read('config.ini')
+config.read('../config.ini')
 
 COOKIE = config.get('cookie', 'cookie')
 CSRF = re.findall('bili_jct=(.*?);', COOKIE)[0]
