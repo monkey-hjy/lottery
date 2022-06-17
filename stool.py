@@ -250,7 +250,7 @@ def save_sql(l_id, uid, open_time, my_cv_id):
         db=config.get('mysql_info', 'db')
     )
     mysql_cursor = mysql_conn.cursor()
-    sql = f"insert into lottery_o (l_id, uid, open_time, my_cv_id) VALUES ('{l_id}', '{uid}', {open_time}, '{my_cv_id}');"
+    sql = f"insert into lottery (l_id, uid, open_time, my_cv_id) VALUES ('{l_id}', '{uid}', {open_time}, '{my_cv_id}');"
     mysql_cursor.execute(sql)
     mysql_conn.commit()
     mysql_cursor.close()
