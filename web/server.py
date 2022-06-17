@@ -41,7 +41,7 @@ def show_list():
             'lottery_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(info[3])),
             'my_cv_id': info[4],
             'reply_date': str(info[5]),
-            'zj_uid': info[6],
+            # 'zj_uid': info[6],
             'is_me': '中奖了!!!!!!!!' if info[7] else '否',
         }
         if int(info[3]) > int(time.time()):
