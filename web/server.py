@@ -12,6 +12,7 @@ import time
 config = configparser.RawConfigParser()
 path = '/'.join(__file__.split('/')[:-2])
 config.read(f'{path}/config.ini')
+print(f'{path}/config.ini')
 app = Flask(__name__, template_folder='./')
 
 
@@ -22,7 +23,6 @@ def hello_world():
 
 @app.route('/list')
 def show_list():
-    print(f'{path}/config.ini')
     mysql_conn = pymysql.Connect(
         host=config.get('mysql_info', 'host'),
         port=int(config.get('mysql_info', 'port')),
