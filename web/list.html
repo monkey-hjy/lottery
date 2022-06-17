@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+<body>
+<h1 class="text-center">参与的抽奖信息</h1>
+<table class="table table-hover" style="width: 80%;margin: 5% auto">
+    <tr>
+<!--        <th>ID</th>-->
+        <th>抽奖动态</th>
+        <th>用户ID</th>
+        <th>开奖时间</th>
+        <th>转发ID</th>
+        <th>转发时间</th>
+    </tr>
+    {% for item in open_data %}
+    <tr style="color: grey">
+        {% for key in item %}
+            {% if key == 'l_id' %}
+                <td><a href="https://t.bilibili.com/{{item[key]}}">{{ item[key] }}</a></td>
+            {% else %}
+                <td>{{ item[key] }}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+
+    {% for item in not_open_data %}
+    <tr>
+        {% for key in item %}
+            {% if key == 'l_id' %}
+                <td><a href="https://t.bilibili.com/{{item[key]}}">{{ item[key] }}</a></td>
+            {% else %}
+                <td>{{ item[key] }}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
