@@ -11,19 +11,16 @@ import requests
 from loguru import logger
 import configparser
 
-logger.add('lottery.log', mode='a')
-config = configparser.RawConfigParser()
-config.read('./config.ini')
 BRIEF_HEADERS = {
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36'
 }
 
-mysql_conn = pymysql.connect(
-    host=config.get('mysql', 'host'),
-    port=int(config.get('mysql', 'port')),
-    user=config.get('mysql', 'user'),
-    password=config.get('mysql', 'password'),
-    db=config.get('mysql', 'db'),
+mysql_conn = pymysql.Connect(
+    host='localhost',
+    port=3306,
+    user='root',
+    passwd='root',
+    db='demo'
 )
 mysql_cursor = mysql_conn.cursor()
 sql = "select * from lottery where win_uid is null;"
