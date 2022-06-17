@@ -13,6 +13,7 @@ config = configparser.RawConfigParser()
 path = '/'.join(__file__.split('/')[:-2])
 config.read(f'{path}/config.ini')
 print(f'{path}/config.ini')
+print(config['mysql'])
 app = Flask(__name__, template_folder='./')
 
 
