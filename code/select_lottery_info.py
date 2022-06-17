@@ -13,7 +13,7 @@ import configparser
 
 logger.add('lottery.log', mode='a')
 config = configparser.RawConfigParser()
-config.read('../config.ini')
+config.read('./config.ini')
 BRIEF_HEADERS = {
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36'
 }
