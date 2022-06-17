@@ -1,6 +1,11 @@
 # lottery
 B站参加抽奖
 
+### 使用方法
+1. 使用 `requirements.txt` 文件安装依赖
+2. 使用下方表结构代码建表
+3. 修改配置文件中的信息
+
 ### 表结构
 ```sql
 create table lottery
