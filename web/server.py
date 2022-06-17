@@ -10,8 +10,8 @@ from flask import Flask, render_template
 import time
 
 config = configparser.RawConfigParser()
-print(__file__)
-config.read('../config.ini')
+path = '/'.join(__file__.split('/')[:-2])
+config.read(f'{path}/config.ini')
 app = Flask(__name__, template_folder='./')
 
 
