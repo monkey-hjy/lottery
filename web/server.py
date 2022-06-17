@@ -22,6 +22,7 @@ def hello_world():
 
 @app.route('/list')
 def show_list():
+    print(f'{path}/config.ini')
     mysql_conn = pymysql.Connect(
         host=config.get('mysql_info', 'host'),
         port=int(config.get('mysql_info', 'port')),
