@@ -258,3 +258,44 @@ def save_sql(l_id, uid, open_time, my_cv_id):
     REDIS_CONN.sadd('lottery_id', l_id)
     logger.info(f'save success l_id: {l_id}, uid: {uid}, open_time: {open_time}, my_cv_id: {my_cv_id}')
     logger.info('-'*50)
+
+
+def search_lottery_info():
+    """
+    查询已开奖的中奖信息
+    """
+    mysql_conn = pymysql.Connect(
+        host=config.get('mysql_info', 'host'),
+        port=int(config.get('mysql_info', 'port')),
+        user=config.get('mysql_info', 'user'),
+        passwd=config.get('mysql_info', 'passwd'),
+        db=config.get('mysql_info', 'db')
+    )
+    mysql_cursor = mysql_conn.cursor()
+    sql = f"select * from lottery where open_time<={int(time.time())} and win_uid is null;"
+    mysql_cursor.execute(sql)
+    data = mysql_cursor.fetchall()
+    for info in data:
+        if info[3] <= int(time.time()):
+            url = f'https://api.vc.bilibili.com/lottery_svr/v1/lottery_svr/lottery_notice?dynamic_id={info[1]}'
+            win_uid = list()
+            win_name = list()
+            response = requests.get(url, headers=BRIEF_HEADERS, timeout=30).json()
+            if response['code'] == 0:
+                response = response['data']['lottery_result']
+                for key in response:
+                    for now_win_info in response[key]:
+                        win_uid.append(str(now_win_info['uid']))
+                        win_name.append(now_win_info['name'])
+            if win_uid:
+                is_me = 0
+                win_uid = ','.join(win_uid)
+                if '347405521' in win_uid:
+                    is_me = 1
+                if 'Monkey-_-' in win_name:
+                    is_me = 1
+                sql = f"update lottery set win_uid='{win_uid}', me_win={is_me} where id={info[0]};"
+                mysql_cursor.execute(sql)
+                mysql_conn.commit()
+    mysql_cursor.close()
+    mysql_conn.close()
