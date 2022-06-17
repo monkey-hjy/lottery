@@ -80,7 +80,7 @@ def get_all_lottery():
     # response = requests.get(url, headers=HEADERS).json()['data']['result']
     ids = [info['id'] for info in response]
     lottery_ids = list()
-    for cv_id in ids[:2]:
+    for cv_id in ids:
         url = 'https://www.bilibili.com/read/cv{}'.format(cv_id)
         try:
             response = get_response(url, method='get', headers=BRIEF_HEADERS)
