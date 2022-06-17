@@ -39,7 +39,9 @@ def show_list():
             'uid': info[2],
             'lottery_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(info[3])),
             'my_cv_id': info[4],
-            'reply_date': str(info[5])
+            'reply_date': str(info[5]),
+            'zj_uid': '',
+            'is_me': '否',
         }
         if int(info[3]) > int(time.time()):
             not_open_data.append(now_info)
