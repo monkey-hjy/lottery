@@ -14,7 +14,7 @@ import requests
 from loguru import logger
 import configparser
 
-logger.add('lottery_o.loc', mode='a')
+logger.add('lottery.log', mode='a')
 config = configparser.RawConfigParser()
 config.read('config.ini')
 

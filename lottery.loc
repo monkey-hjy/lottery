@@ -1,3 +1,0 @@
-2022-06-17 15:54:21.911 | ERROR    | stool:get_all_lottery:97 - https://www.bilibili.com/read/cv17123473, AUTH <password> called without any password configured for the default user. Are you sure your configuration is correct?
-2022-06-17 15:54:22.177 | ERROR    | stool:get_all_lottery:97 - https://www.bilibili.com/read/cv17013604, AUTH <password> called without any password configured for the default user. Are you sure your configuration is correct?
-2022-06-17 15:54:22.177 | INFO     | stool:get_all_lottery:98 - res: 0
