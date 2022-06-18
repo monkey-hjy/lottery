@@ -87,7 +87,7 @@ def get_all_lottery():
             if response is None:
                 continue
             # response = requests.get(url, headers=BRIEF_HEADERS, timeout=15)
-            now_ids = re.findall('href="https://t\.bilibili\.com/(.*?)\?', response.text)
+            now_ids = re.findall(r'href.*?t.bilibili.com/(.*?)["\'|?]', response.text)
             for l_id in now_ids:
                 if REDIS_CONN.sismember('lottery_ids', l_id):
                     continue
