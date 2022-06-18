@@ -255,7 +255,7 @@ def save_sql(l_id, uid, open_time, my_cv_id):
     mysql_conn.commit()
     mysql_cursor.close()
     mysql_conn.close()
-    REDIS_CONN.sadd('lottery_id', l_id)
+    REDIS_CONN.sadd('lottery_ids', l_id)
     logger.info(f'save success l_id: {l_id}, uid: {uid}, open_time: {open_time}, my_cv_id: {my_cv_id}')
     logger.info('-'*50)
 
