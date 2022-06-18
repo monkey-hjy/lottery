@@ -55,7 +55,7 @@ def get_response(url, method='get', data=None, params=None, headers=None):
             if method.lower() == 'get':
                 response = requests.get(url, headers=headers, params=params, timeout=30)
             elif method.lower() == 'post':
-                response = requests.post(url, headers=headers, json=data, timeout=30)
+                response = requests.post(url, headers=headers, data=data, timeout=30)
             else:
                 logger.error(f'请求参数错误 method: {method}')
                 return None
