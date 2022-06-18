@@ -7,6 +7,7 @@
 import random
 import re
 import time
+import os
 
 import pymysql
 import redis
@@ -16,12 +17,11 @@ import configparser
 
 logger.add('lottery.log', mode='a')
 config = configparser.RawConfigParser()
-config.read('../config.ini')
+config.read('./config.ini')
 
 COOKIE = config.get('cookie', 'cookie')
 CSRF = re.findall('bili_jct=(.*?);', COOKIE)[0]
 HEADERS = {
-    'content-type': 'application/x-www-form-urlencoded',
     'cookie': COOKIE,
     'origin': 'https://space.bilibili.com',
     'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
@@ -55,7 +55,7 @@ def get_response(url, method='get', data=None, params=None, headers=None):
             if method.lower() == 'get':
                 response = requests.get(url, headers=headers, params=params, timeout=30)
             elif method.lower() == 'post':
-                response = requests.post(url, headers=headers, data=data, params=params, timeout=30)
+                response = requests.post(url, headers=headers, json=data, timeout=30)
             else:
                 logger.error(f'请求参数错误 method: {method}')
                 return None
@@ -299,3 +299,79 @@ def search_lottery_info():
                 mysql_conn.commit()
     mysql_cursor.close()
     mysql_conn.close()
+
+
+def de_follow_user(uid):
+    """
+    取消关注用户
+    :params uid: 用户ID
+    """
+    url = 'https://api.bilibili.com/x/relation/modify'
+    data = {
+        'fid': str(uid),
+        'act': '2',
+        're_src': '11',
+        'spmid': '333.999.0.0',
+        'extend_content': '{"entity":"user","entity_id":' + str(uid) + ',"fp":"0\u0001900,,1440\u0001MacIntel\u00018\u00018\u000130\u00011\u0001zh-CN\u00011\u00010,,0,,0\u0001Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"}',
+        'jsonp': 'jsonp',
+        'csrf': CSRF,
+    }
+    response = get_response(url, method='post', data=data, headers=HEADERS).json()
+    if response['code'] == 0:
+        logger.info(f'de_follow success uid: {uid}')
+    else:
+        logger.error(f'de_follow failed uid: {uid}, res: {response}')
+
+
+def del_my_cv(cv_id):
+    """
+    删除我转发的动态
+    :params cv_id: 动态ID
+    """
+    url = f'https://api.bilibili.com/x/dynamic/feed/operate/remove?csrf={CSRF}'
+    data = {
+        'dyn_id_str': str(cv_id)
+    }
+    response = get_response(url, method='post', data=data, headers=HEADERS).json()
+    if response['code'] == 0:
+        logger.info(f'del_mv_cv success cv_id: {cv_id}')
+    else:
+        logger.error(f'del_mv_cv failed cv_id: {cv_id}, res: {response}')
+
+
+def delete_expired_info():
+    """
+    删除过期的中奖信息
+    暂定超过24小时且未中奖的过期
+    删除转发的动态, 并且取消关注UP主
+    """
+    mysql_conn = pymysql.Connect(
+        host=config.get('mysql_info', 'host'),
+        port=int(config.get('mysql_info', 'port')),
+        user=config.get('mysql_info', 'user'),
+        passwd=config.get('mysql_info', 'passwd'),
+        db=config.get('mysql_info', 'db')
+    )
+    mysql_cursor = mysql_conn.cursor()
+    now_expried_uid = list()
+    del_id = list()
+    sql = f"select * from lottery;"
+    mysql_cursor.execute(sql)
+    data = mysql_cursor.fetchall()
+    for info in data:
+        # 开奖时间不超过24小时, 或者已中奖的, 不取关UP
+        if info[3] > int(time.time()) - 24 * 60 * 60 or info[7] == 1:
+            now_expried_uid.append(info[2])
+    for info in data:
+        if info[3] <= int(time.time()) - 24 * 60 * 60:
+            if info[2] not in now_expried_uid:
+                de_follow_user(info[2])
+            del_my_cv(info[4])
+            del_id.append(str(info[0]))
+    sql = f"update lottery set is_delete=1 where id in ({','.join(del_id)});"
+    mysql_cursor.execute(sql)
+    mysql_conn.commit()
+    mysql_cursor.close()
+    mysql_conn.close()
+    logger.info(f'delete expired info success, num: {len(del_id)}')
+

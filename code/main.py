@@ -21,3 +21,4 @@ for l_id in lottery_ids:
     save_sql(l_id, uid, lottery_time, my_cv_id)
     time.sleep(30)
 search_lottery_info()
+delete_expired_info

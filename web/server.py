@@ -27,7 +27,7 @@ def show_list():
         db='demo'
     )
     mysql_cursor = mysql_conn.cursor()
-    sql = "select * from lottery order by open_time asc;"
+    sql = "select * from lottery where is_delete=0 order by open_time asc;"
     mysql_cursor.execute(sql)
     open_data = list()
     not_open_data = list()
