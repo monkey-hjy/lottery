@@ -133,9 +133,12 @@ def get_user_uid(l_id):
         return False, False, False
     response = response.json()
     # response = requests.get(url, headers=BRIEF_HEADERS).json()
-    comment_id = response['data']['item']['basic']['comment_id_str']
-    uid = response['data']['item']['modules']['module_author']['mid']
-    return comment_id, uid, open_time
+    try:
+        comment_id = response['data']['item']['basic']['comment_id_str']
+        uid = response['data']['item']['modules']['module_author']['mid']
+        return comment_id, uid, open_time
+    except:
+        return False, False, False
 
 
 def reply(l_id):
