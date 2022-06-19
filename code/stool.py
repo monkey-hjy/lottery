@@ -289,7 +289,7 @@ def search_lottery_info():
                 win_uid = ','.join(win_uid)
                 if '347405521' in win_uid:
                     is_me = 1
-                if 'Monkey-_-' in win_name:
+                if 'Monkey' in win_name:
                     is_me = 1
                 sql = f"update lottery set win_uid='{win_uid}', me_win={is_me} where id={info[0]};"
                 mysql_cursor.execute(sql)
