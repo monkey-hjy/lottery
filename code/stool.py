@@ -24,12 +24,6 @@ CSRF = re.findall('bili_jct=(.*?);', COOKIE)[0]
 HEADERS = {
     'cookie': COOKIE,
     'origin': 'https://space.bilibili.com',
-    'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"macOS"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-site',
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36',
 }
 BRIEF_HEADERS = {
@@ -40,7 +34,7 @@ REDIS_CONFIG = config['redis']
 REDIS_CONN = redis.StrictRedis(host=REDIS_CONFIG['host'], port=REDIS_CONFIG['port'], password=REDIS_CONFIG['password'], db=REDIS_CONFIG['db'])
 
 
-def get_response(url, method='get', data=None, params=None, headers=None):
+def get_response(url, method='get', data=None, json=None, params=None, headers=None):
     """
     获取响应
     :param url: 请求地址
@@ -55,7 +49,7 @@ def get_response(url, method='get', data=None, params=None, headers=None):
             if method.lower() == 'get':
                 response = requests.get(url, headers=headers, params=params, timeout=30)
             elif method.lower() == 'post':
-                response = requests.post(url, headers=headers, data=data, timeout=30)
+                response = requests.post(url, headers=headers, data=data, json=json, timeout=30)
             else:
                 logger.error(f'请求参数错误 method: {method}')
                 return None
@@ -335,7 +329,7 @@ def del_my_cv(cv_id):
     data = {
         'dyn_id_str': str(cv_id)
     }
-    response = get_response(url, method='post', data=data, headers=HEADERS).json()
+    response = get_response(url, method='post', json=data, headers=HEADERS).json()
     if response['code'] == 0:
         logger.info(f'del_mv_cv success cv_id: {cv_id}')
     else:
@@ -358,7 +352,7 @@ def delete_expired_info():
     mysql_cursor = mysql_conn.cursor()
     now_expried_uid = list()
     del_id = list()
-    sql = f"select * from lottery;"
+    sql = f"select * from lottery where is_delete=0;"
     mysql_cursor.execute(sql)
     data = mysql_cursor.fetchall()
     for info in data:
@@ -371,9 +365,10 @@ def delete_expired_info():
                 de_follow_user(info[2])
             del_my_cv(info[4])
             del_id.append(str(info[0]))
-    sql = f"update lottery set is_delete=1 where id in ({','.join(del_id)});"
-    mysql_cursor.execute(sql)
-    mysql_conn.commit()
+    if del_id:
+        sql = f"update lottery set is_delete=1 where id in ({','.join(del_id)});"
+        mysql_cursor.execute(sql)
+        mysql_conn.commit()
     mysql_cursor.close()
     mysql_conn.close()
     logger.info(f'delete expired info success, num: {len(del_id)}')
