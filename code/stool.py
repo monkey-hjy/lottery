@@ -354,7 +354,7 @@ def delete_expired_info():
     mysql_cursor = mysql_conn.cursor()
     now_expried_uid = list()
     del_id = list()
-    sql = f"select * from lottery where is_delete=0;"
+    sql = f"select * from lottery where is_delete=0 and me_win=0;"
     mysql_cursor.execute(sql)
     data = mysql_cursor.fetchall()
     for info in data:
