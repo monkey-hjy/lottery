@@ -3,9 +3,6 @@
 # Date : 2022/6/14 18:25
 # Name : main.py
 from stool import *
-from loguru import logger
-
-logger.add('lottery.log', mode='a')
 
 while True:
     lottery_ids = get_all_lottery()
