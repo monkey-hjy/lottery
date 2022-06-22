@@ -15,7 +15,9 @@ while True:
             time.sleep(10)
             continue
         logger.info(f'get_user_uid success l_id: {l_id}, comment_id: {comment_id}, uid: {uid}, lottery_time: {lottery_time}')
-        comment(comment_id, l_id)
+        res = comment(comment_id, l_id)
+        if res is False:
+            continue
         click_like(l_id)
         my_cv_id = reply(l_id)
         follow_user(uid)

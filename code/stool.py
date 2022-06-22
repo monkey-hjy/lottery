@@ -191,8 +191,10 @@ def comment(comment_id, l_id):
     if res != 0:
         res = response.json()
         logger.error(f'comment error l_id: {l_id}, res: {res}, data: {data}')
+        return False
     else:
         logger.info(f'comment success l_id: {l_id}')
+        return True
 
 
 def follow_user(uid):
