@@ -16,7 +16,6 @@ from loguru import logger
 import configparser
 
 now_file_path = __file__.split('/')
-print(f"{'/'.join(now_file_path[:-2])}/config.ini")
 logger.add(f"{'/'.join(now_file_path[:-3])}/log_dir/lottery.log", mode='a')
 config = configparser.RawConfigParser()
 config.read(f"{'/'.join(now_file_path[:-2])}/config.ini")

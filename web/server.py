@@ -10,6 +10,9 @@ from flask import Flask, render_template
 import time
 
 app = Flask(__name__, template_folder='./')
+now_file_path = __file__.split('/')
+config = configparser.RawConfigParser()
+config.read(f"{'/'.join(now_file_path[:-2])}/config.ini")
 
 
 @app.route('/')
@@ -20,11 +23,11 @@ def hello_world():
 @app.route('/list')
 def show_list():
     mysql_conn = pymysql.Connect(
-        host='localhost',
-        port=3306,
-        user='root',
-        passwd='root',
-        db='demo'
+        host=config.get('mysql_info', 'host'),
+        port=int(config.get('mysql_info', 'port')),
+        user=config.get('mysql_info', 'user'),
+        passwd=config.get('mysql_info', 'passwd'),
+        db=config.get('mysql_info', 'db')
     )
     mysql_cursor = mysql_conn.cursor()
     sql = "select * from lottery where is_delete=0 order by open_time asc;"
