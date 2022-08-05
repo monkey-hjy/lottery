@@ -15,10 +15,11 @@ import requests
 from loguru import logger
 import configparser
 
-now_file_path = __file__.split('/')[-1]
-logger.add(f"{'/'.join(now_file_path[-2])}/log_dir/lottery.log", mode='a')
+now_file_path = __file__.split('/')
+print(f"{'/'.join(now_file_path[:-2])}/config.ini")
+logger.add(f"{'/'.join(now_file_path[:-3])}/log_dir/lottery.log", mode='a')
 config = configparser.RawConfigParser()
-config.read(f"{'/'.join(now_file_path[-1])}/config.ini")
+config.read(f"{'/'.join(now_file_path[:-2])}/config.ini")
 
 COOKIE = config.get('cookie', 'cookie')
 CSRF = re.findall('bili_jct=(.*?);', COOKIE)[0]
@@ -375,4 +376,3 @@ def delete_expired_info():
     mysql_cursor.close()
     mysql_conn.close()
     logger.info(f'delete expired info success, num: {len(del_id)}')
-
