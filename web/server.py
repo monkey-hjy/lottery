@@ -48,6 +48,7 @@ def show_list():
             'is_me': '中奖了!!!!!!!!' if info[7] else '否',
         }
         if int(info[4]) > int(time.time()):
+            now_info['is_me'] = '未知' if now_info['is_me'] == '否' else now_info['is_me']
             not_open_data.append(now_info)
         else:
             now_info['lottery_time'] = f'{now_info["lottery_time"]}(已开奖)'
