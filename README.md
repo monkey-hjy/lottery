@@ -8,17 +8,18 @@ B站参加抽奖
 
 #### 表结构
 ```sql
-create table lottery
-(
-    id          int auto_increment
-        primary key,
-    l_id        varchar(100)                       null comment '抽奖动态ID',
-    uid         varchar(100)                       null comment '用户ID',
-    open_time   int                                null comment '开奖时间戳',
-    my_cv_id    varchar(100)                       null comment '转发的动态ID',
-    create_time datetime default CURRENT_TIMESTAMP null
-)
-    comment 'b站抽奖信息';
+CREATE TABLE `lottery`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `l_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '抽奖动态ID',
+  `uid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户ID',
+  `my_cv_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '转发的动态ID',
+  `open_time` int NULL DEFAULT NULL COMMENT '开奖时间戳',
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  `win_uid` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '中奖用户ID\r\n',
+  `me_win` int NULL DEFAULT NULL COMMENT '是否是我中奖。0-否   1-是',
+  `is_delete` int NOT NULL DEFAULT 0 COMMENT '0-正常   1-删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 165 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'b站抽奖信息' ROW_FORMAT = Dynamic;
 ```
 
 #### config.ini
