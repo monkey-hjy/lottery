@@ -276,27 +276,27 @@ def search_lottery_info():
     mysql_cursor.execute(sql)
     data = mysql_cursor.fetchall()
     for info in data:
-        if info[3] <= int(time.time()):
-            url = f'https://api.vc.bilibili.com/lottery_svr/v1/lottery_svr/lottery_notice?dynamic_id={info[1]}'
-            win_uid = list()
-            win_name = list()
-            response = requests.get(url, headers=BRIEF_HEADERS, timeout=30).json()
-            if response['code'] == 0:
-                response = response['data']['lottery_result']
-                for key in response:
-                    for now_win_info in response[key]:
-                        win_uid.append(str(now_win_info['uid']))
-                        win_name.append(now_win_info['name'])
-            if win_uid:
-                is_me = 0
-                win_uid = ','.join(win_uid)
-                if '347405521' in win_uid:
-                    is_me = 1
-                if 'Monkey' in win_name:
-                    is_me = 1
-                sql = f"update lottery set win_uid='{win_uid}', me_win={is_me} where id={info[0]};"
-                mysql_cursor.execute(sql)
-                mysql_conn.commit()
+        url = f'https://api.vc.bilibili.com/lottery_svr/v1/lottery_svr/lottery_notice?dynamic_id={info[1]}'
+        win_uid = list()
+        win_name = list()
+        response = requests.get(url, headers=BRIEF_HEADERS, timeout=30).json()
+        if response['code'] == 0:
+            response = response['data']['lottery_result']
+            for key in response:
+                for now_win_info in response[key]:
+                    win_uid.append(str(now_win_info['uid']))
+                    win_name.append(now_win_info['name'])
+        if win_uid:
+            is_me = 0
+            win_uid = ','.join(win_uid)
+            if '347405521' in win_uid:
+                is_me = 1
+            if 'Monkey' in win_name:
+                is_me = 1
+            sql = f"update lottery set win_uid='{win_uid}', me_win={is_me} where id={info[0]};"
+            mysql_cursor.execute(sql)
+            mysql_conn.commit()
+        time.sleep(5)
     mysql_cursor.close()
     mysql_conn.close()
 
