@@ -297,6 +297,8 @@ def search_lottery_info():
             mysql_cursor.execute(sql)
             mysql_conn.commit()
         time.sleep(5)
+    mysql_cursor.execute(f"update lottery set is_delete=1 where open_time<={int(time.time()) - 86400}")
+    mysql_conn.commit()
     mysql_cursor.close()
     mysql_conn.close()
 
