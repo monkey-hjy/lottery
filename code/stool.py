@@ -360,13 +360,13 @@ def delete_expired_info():
     data = mysql_cursor.fetchall()
     for info in data:
         # 开奖时间不超过24小时, 或者已中奖的, 不取关UP
-        if info[3] > int(time.time()) - 24 * 60 * 60 or info[7] == 1:
+        if info[4] > int(time.time()) - 24 * 60 * 60 or info[7] == 1:
             now_expried_uid.append(info[2])
     for info in data:
-        if info[3] <= int(time.time()) - 24 * 60 * 60:
+        if info[4] <= int(time.time()) - 24 * 60 * 60:
             if info[2] not in now_expried_uid:
                 de_follow_user(info[2])
-            del_my_cv(info[4])
+            del_my_cv(info[3])
             del_id.append(str(info[0]))
     if del_id:
         sql = f"update lottery set is_delete=1 where id in ({','.join(del_id)});"
