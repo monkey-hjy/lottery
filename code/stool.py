@@ -375,3 +375,4 @@ def delete_expired_info():
     mysql_cursor.close()
     mysql_conn.close()
     logger.info(f'delete expired info success, num: {len(del_id)}')
+
