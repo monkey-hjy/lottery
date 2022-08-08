@@ -67,7 +67,8 @@ def get_all_lottery():
     """
     获取所有抽奖ID
     """
-    url = 'https://api.bilibili.com/x/web-interface/search/type?__refresh__=true&_extra=&context=&page=1&page_size=50&order=pubdate&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=%E4%BA%92%E5%8A%A8%E6%8A%BD%E5%A5%96&category_id=0&search_type=article&preload=true&com2co=true'
+    # url = 'https://api.bilibili.com/x/web-interface/search/type?__refresh__=true&_extra=&context=&page=1&page_size=50&order=pubdate&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=%E4%BA%92%E5%8A%A8%E6%8A%BD%E5%A5%96&category_id=0&search_type=article&preload=true&com2co=true'
+    url = 'https://api.bilibili.com/x/web-interface/search/type?__refresh__=true&_extra=&context=&page=1&page_size=50&order=pubdate&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=抽奖&category_id=0&search_type=article&preload=true&com2co=true'
     response = get_response(url, method='get', headers=BRIEF_HEADERS)
     if response is None:
         return False
@@ -297,6 +298,8 @@ def search_lottery_info():
             mysql_cursor.execute(sql)
             mysql_conn.commit()
         time.sleep(5)
+    mysql_cursor.execute(f"update lottery set is_delete=1 where open_time<={int(time.time()) - 86400} and me_win != 1")
+    mysql_conn.commit()
     mysql_cursor.close()
     mysql_conn.close()
 
@@ -360,13 +363,13 @@ def delete_expired_info():
     data = mysql_cursor.fetchall()
     for info in data:
         # 开奖时间不超过24小时, 或者已中奖的, 不取关UP
-        if info[3] > int(time.time()) - 24 * 60 * 60 or info[7] == 1:
+        if info[4] > int(time.time()) - 24 * 60 * 60 or info[7] == 1:
             now_expried_uid.append(info[2])
     for info in data:
-        if info[3] <= int(time.time()) - 24 * 60 * 60:
+        if info[4] <= int(time.time()) - 24 * 60 * 60:
             if info[2] not in now_expried_uid:
                 de_follow_user(info[2])
-            del_my_cv(info[4])
+            del_my_cv(info[3])
             del_id.append(str(info[0]))
     if del_id:
         sql = f"update lottery set is_delete=1 where id in ({','.join(del_id)});"
@@ -375,3 +378,4 @@ def delete_expired_info():
     mysql_cursor.close()
     mysql_conn.close()
     logger.info(f'delete expired info success, num: {len(del_id)}')
+
