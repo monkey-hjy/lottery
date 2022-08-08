@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			main{
+				margin: 10px 0;
+			}
+			div{
+				width: 50px;
+				line-height: 50px;
+				border-radius: 50%;
+				text-align: center;
+				display: inline-block;
+				margin: 0 6px;
+				color: #fff;
+				box-shadow: 6px 4px 10px #000;
+			}
+			.red{
+				background: red;
+			}
+			.blue{
+				background: blue;
+			}
+            p{
+                width: 40%;
+                height: 80%;
+            }
+		</style>
+	</head>
+	<body id="bd">
+        <aaa style="font-size: 30px; width: 50%;">
+            <a href="/list">抽奖结果</a><br>
+            <button id="btn" style="font-size: 30px">机选双色球</button>
+        </aaa>
+		<script type="text/javascript">
+			btn.onclick=function(){
+				var user = 5;
+				
+				var mains=document.getElementsByTagName("main");//[elem,elem,elem]
+				if(mains.length>0){
+					for(var i=mains.length-1;i>=0;i--){
+						mains[i].remove();
+					}
+				}
+				
+				for(var j=0;j<user;j++){
+					var reds=[];
+					while(reds.length<6){
+						var r=parseInt(Math.random()*(33-1+1)+1);
+						if(reds.indexOf(r)==-1){
+							reds.push(r);	
+						}
+					}
+					reds.sort(function(a,b){return a-b})
+					
+					var blue=parseInt(Math.random()*(16-1+1)+1);
+					
+					var father=document.createElement("main");
+					
+					for(var i=0;i<reds.length;i++){
+						var red=document.createElement("div");
+						red.innerHTML=reds[i];
+						red.className="red";
+						father.appendChild(red);
+					}
+					var bl=document.createElement("div");
+					bl.innerHTML=blue;
+					bl.className="blue";
+					father.appendChild(bl);
+					bd.appendChild(father);
+				}
+			}
+			
+		</script>
+	</body>
+</html>

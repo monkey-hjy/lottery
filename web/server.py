@@ -17,7 +17,7 @@ config.read(f"{'/'.join(now_file_path[:-2])}/config.ini")
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return render_template('index.html')
 
 
 @app.route('/list')
