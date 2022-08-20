@@ -8,6 +8,7 @@ import random
 import re
 import time
 import os
+import sys
 
 import pymysql
 import redis
@@ -193,6 +194,8 @@ def comment(comment_id, l_id):
     if res != 0:
         res = response.json()
         logger.error(f'comment error l_id: {l_id}, res: {res}, data: {data}')
+        if res['message'] == '账号未登录':
+            sys.exit()
         return False
     else:
         logger.info(f'comment success l_id: {l_id}')
