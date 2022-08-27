@@ -52,3 +52,4 @@ for info in user_res:
         time.sleep(30)
     st.search_lottery_info()
     st.delete_expired_info()
+    logger.info(f'{info} 处理结束')
