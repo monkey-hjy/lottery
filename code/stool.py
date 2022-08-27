@@ -15,6 +15,7 @@ import redis
 import requests
 from loguru import logger
 import configparser
+import traceback
 
 
 class Stool:
@@ -112,7 +113,7 @@ class Stool:
                     lottery_ids.append(l_id)
                 logger.info(f'{url}, {len(lottery_ids)}')
             except Exception as e:
-                logger.error(f'{url}, {e.args[0]}')
+                logger.error(f'{url}, {traceback.format_exc()}')
         logger.info(f'res: {len(set(lottery_ids))}')
         return list(set(lottery_ids))
 
