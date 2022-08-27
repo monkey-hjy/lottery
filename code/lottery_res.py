@@ -2,7 +2,8 @@
 # User : HJY
 # Date : 2022/8/5 16:35
 # Name : lottery_res.py
-from stool import *
+from stool import Stool
 
-search_lottery_info()
+
+Stool(user_info='').search_lottery_info()
 
