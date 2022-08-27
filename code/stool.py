@@ -85,7 +85,7 @@ class Stool:
                     raise Exception(response.status_code)
             except Exception as e:
                 err_count += 1
-                logger.error(f'requests err {err_count}, e: {e.args[0]}')
+                logger.error(f'requests err {err_count}, e: {traceback.format_exc()}')
 
     def get_all_lottery(self):
         """
