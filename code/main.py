@@ -23,6 +23,7 @@ mysql_cursor = mysql_conn.cursor()
 sql = "select * from user;"
 mysql_cursor.execute(sql)
 user_res = mysql_cursor.fetchall()
+lottery_ids = None
 for info in user_res:
     info = {
         'uid': info[1],
@@ -30,7 +31,8 @@ for info in user_res:
         'name': info[3]
     }
     st = Stool(user_info=info)
-    lottery_ids = st.get_all_lottery()
+    if lottery_ids is None:
+        lottery_ids = st.get_all_lottery()
     for l_id in lottery_ids:
         l_id = str(l_id)
         comment_id, uid, lottery_time = st.get_user_uid(l_id)
