@@ -30,6 +30,9 @@ def show_list():
         db=config.get('mysql_info', 'db')
     )
     mysql_cursor = mysql_conn.cursor()
+    now_user_sql = 'select * from user;'
+    mysql_cursor.execute(now_user_sql)
+    user_info = {info[1]: info[3] for info in mysql_cursor.fetchall()}
     sql = "select * from lottery where is_delete=0 order by open_time asc;"
     mysql_cursor.execute(sql)
     open_data = list()
@@ -46,6 +49,7 @@ def show_list():
             'reply_date': str(info[5]),
             # 'zj_uid': info[6],
             'is_me': '中奖了!!!!!!!!' if info[7] else '否',
+            'my_name': user_info[info[9]] if info[9] in user_info else '未知用户'
         }
         if int(info[4]) > int(time.time()):
             now_info['is_me'] = '未知' if now_info['is_me'] == '否' else now_info['is_me']

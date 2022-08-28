@@ -25,8 +25,8 @@ class Stool:
             sys.exit()
         now_file_path = __file__.split('/')
         logger.add(f"{'/'.join(now_file_path[:-3])}/log_dir/lottery.log", mode='a')
-        config = configparser.RawConfigParser()
-        config.read(f"{'/'.join(now_file_path[:-2])}/config.ini")
+        self.config = configparser.RawConfigParser()
+        self.config.read(f"{'/'.join(now_file_path[:-2])}/config.ini")
         self.user_info = user_info
         COOKIE = user_info['cookie']
         self.CSRF = re.findall('bili_jct=(.*?);', COOKIE)[0]
@@ -36,10 +36,11 @@ class Stool:
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36',
         }
         self.BRIEF_HEADERS = {
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36'
+            # 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36'
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
         }
-        self.KEYWORDS = config.get('keywords', 'keywords').split(',')
-        self.REDIS_CONFIG = config['redis']
+        self.KEYWORDS = self.config.get('keywords', 'keywords').split(',')
+        self.REDIS_CONFIG = self.config['redis']
         self.REDIS_CONN = redis.StrictRedis(
             host=self.REDIS_CONFIG['host'], 
             port=self.REDIS_CONFIG['port'], 
@@ -47,17 +48,30 @@ class Stool:
             db=self.REDIS_CONFIG['db']
         )
         self.mysql_conn = pymysql.Connect(
-            host=config.get('mysql_info', 'host'),
-            port=int(config.get('mysql_info', 'port')),
-            user=config.get('mysql_info', 'user'),
-            passwd=config.get('mysql_info', 'passwd'),
-            db=config.get('mysql_info', 'db')
+            host=self.config.get('mysql_info', 'host'),
+            port=int(self.config.get('mysql_info', 'port')),
+            user=self.config.get('mysql_info', 'user'),
+            passwd=self.config.get('mysql_info', 'passwd'),
+            db=self.config.get('mysql_info', 'db')
         )
         self.mysql_cursor = self.mysql_conn.cursor()
 
     def __del__(self):
         self.mysql_cursor.close()
         self.mysql_conn.close()
+
+    def test_mysql_conn(self):
+        try:
+            self.mysql_conn.ping()
+        except:
+            self.mysql_conn = pymysql.Connect(
+            host=self.config.get('mysql_info', 'host'),
+            port=int(self.config.get('mysql_info', 'port')),
+            user=self.config.get('mysql_info', 'user'),
+            passwd=self.config.get('mysql_info', 'passwd'),
+            db=self.config.get('mysql_info', 'db')
+        )
+        self.mysql_cursor = self.mysql_conn.cursor()
 
     @staticmethod
     def get_response(url, method='get', data=None, json=None, params=None, headers=None):
@@ -82,10 +96,10 @@ class Stool:
                 if response.status_code == 200:
                     return response
                 else:
-                    raise Exception(response.status_code)
+                    raise Exception(response.text)
             except Exception as e:
                 err_count += 1
-                logger.error(f'requests err {err_count}, e: {traceback.format_exc()}')
+                logger.error(f'requests err {err_count}, e: {traceback.format_exc()}, \nurl: {url}, \ne: {e.args[0]}')
 
     def get_all_lottery(self):
         """
@@ -93,7 +107,8 @@ class Stool:
         """
         # url = 'https://api.bilibili.com/x/web-interface/search/type?__refresh__=true&_extra=&context=&page=1&page_size=50&order=pubdate&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=%E4%BA%92%E5%8A%A8%E6%8A%BD%E5%A5%96&category_id=0&search_type=article&preload=true&com2co=true'
         url = 'https://api.bilibili.com/x/web-interface/search/type?__refresh__=true&_extra=&context=&page=1&page_size=50&order=pubdate&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=抽奖&category_id=0&search_type=article&preload=true&com2co=true'
-        response = self.get_response(url, method='get', headers=self.BRIEF_HEADERS)
+        # response = self.get_response(url, method='get', headers=self.BRIEF_HEADERS)
+        response = self.get_response(url, method='get', headers=self.HEADERS)
         if response is None:
             return False
         response = response.json()['data']['result']
@@ -262,10 +277,9 @@ class Stool:
         :param my_cv_id: 转发的动态ID
         """
         sql = f"insert into lottery (l_id, uid, open_time, my_cv_id, my_uid) VALUES ('{l_id}', '{uid}', {open_time}, '{my_cv_id}', {self.user_info['uid']});"
+        self.test_mysql_conn()
         self.mysql_cursor.execute(sql)
         self.mysql_conn.commit()
-        self.mysql_cursor.close()
-        self.mysql_conn.close()
         self.REDIS_CONN.sadd(f'lottery_ids_{self.user_info["uid"]}', l_id)
         logger.info(f'save success l_id: {l_id}, uid: {uid}, open_time: {open_time}, my_cv_id: {my_cv_id}')
         logger.info('-'*50)
@@ -275,6 +289,7 @@ class Stool:
         查询已开奖的中奖信息
         """
         sql = f"select * from lottery where open_time<={int(time.time())} and win_uid is null and my_uid={self.user_info['uid']};"
+        self.test_mysql_conn()
         self.mysql_cursor.execute(sql)
         data = self.mysql_cursor.fetchall()
         for info in data:
@@ -296,9 +311,11 @@ class Stool:
                 if self.user_info['name'] in win_name:
                     is_me = 1
                 sql = f"update lottery set win_uid='{win_uid}', me_win={is_me} where id={info[0]};"
+                self.test_mysql_conn()
                 self.mysql_cursor.execute(sql)
                 self.mysql_conn.commit()
             time.sleep(5)
+        self.test_mysql_conn()
         self.mysql_cursor.execute(f"update lottery set is_delete=1 where open_time<={int(time.time()) - 86400} and me_win != 1")
         self.mysql_conn.commit()
 
@@ -347,6 +364,7 @@ class Stool:
         now_expried_uid = list()
         del_id = list()
         sql = f"select * from lottery where is_delete=0 and me_win=0 and my_uid={self.user_info['uid']};"
+        self.test_mysql_conn()
         self.mysql_cursor.execute(sql)
         data = self.mysql_cursor.fetchall()
         for info in data:
@@ -361,6 +379,7 @@ class Stool:
                 del_id.append(str(info[0]))
         if del_id:
             sql = f"update lottery set is_delete=1 where id in ({','.join(del_id)});"
+            self.test_mysql_conn()
             self.mysql_cursor.execute(sql)
             self.mysql_conn.commit()
         logger.info(f'delete expired info success, num: {len(del_id)}')

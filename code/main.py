@@ -24,8 +24,10 @@ sql = "select * from user;"
 mysql_cursor.execute(sql)
 user_res = mysql_cursor.fetchall()
 for info in user_res:
+    if info[1] == 347405521:
+        continue
     info = {
-        'uid': info[1],
+        'uid': str(info[1]),
         'cookie': info[2],
         'name': info[3]
     }
@@ -36,7 +38,7 @@ for info in user_res:
         comment_id, uid, lottery_time = st.get_user_uid(l_id)
         if not comment_id:
             logger.error(f'get_user_uid failed l_id: {l_id}')
-            st.REDIS_CONN.sadd('lottery_ids', l_id)
+            st.REDIS_CONN.sadd(f'lottery_ids_{info["uid"]}', l_id)
             time.sleep(10)
             continue
         logger.info(f'get_user_uid success l_id: {l_id}, comment_id: {comment_id}, uid: {uid}, lottery_time: {lottery_time}')
@@ -53,3 +55,5 @@ for info in user_res:
     st.search_lottery_info()
     st.delete_expired_info()
     logger.info(f'{info} 处理结束')
+    logger.info('-'*50)
+    time.sleep(600)
