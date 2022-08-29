@@ -24,8 +24,6 @@ sql = "select * from user;"
 mysql_cursor.execute(sql)
 user_res = mysql_cursor.fetchall()
 for info in user_res:
-    if info[1] == 347405521:
-        continue
     info = {
         'uid': str(info[1]),
         'cookie': info[2],
